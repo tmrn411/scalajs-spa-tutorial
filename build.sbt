@@ -1,6 +1,10 @@
 import sbt.Keys._
 import sbt.Project.projectToRef
 
+// Useful resources for debugging build configuration
+// https://github.com/vmunier/play-scalajs.g8/tree/master/src/main/g8
+// https://github.com/vmunier/akka-http-scalajs.g8/tree/master/src/main/g8
+
 EclipseKeys.skipParents in ThisBuild := false
 
 // a special crossProject for configuring a JS/JVM/shared structure
@@ -55,6 +59,7 @@ lazy val server = (project in file("server"))
     scalaVersion := Settings.versions.scala,
     scalacOptions ++= Settings.scalacOptions,
     libraryDependencies ++= Settings.jvmDependencies.value,
+    libraryDependencies += guice,
     commands += ReleaseCmd,
     // triggers scalaJSPipeline when using compile or continuous compilation
     compile in Compile := ((compile in Compile) dependsOn scalaJSPipeline).value,
