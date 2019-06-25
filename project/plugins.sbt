@@ -13,6 +13,6 @@ addSbtPlugin("com.vmunier" % "sbt-web-scalajs" % "1.0.9-0.6")
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-digest" % "1.1.4")
 
-addSbtPlugin("com.typesafe.sbt" % "sbt-gzip" % "1.0.0")
+addSbtPlugin("com.typesafe.sbt" % "sbt-gzip" % "1.0.2")
 
 addSbtPlugin("com.typesafe.sbteclipse" % "sbteclipse-plugin" % "5.2.4")
