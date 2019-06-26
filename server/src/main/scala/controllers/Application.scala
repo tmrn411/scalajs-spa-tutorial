@@ -1,11 +1,17 @@
 package controllers
 
+import scala.concurrent.{ExecutionContext, Future}
+
 import java.nio.ByteBuffer
+import javax.inject._
+
+import akka.stream.Materializer
 
 import boopickle.Default._
-import javax.inject._
+
 import play.api.{Configuration, Environment}
 import play.api.mvc._
+
 import services.ApiService
 import spatutorial.shared.Api
 
@@ -19,7 +25,9 @@ object Router extends autowire.Server[ByteBuffer, Pickler, Pickler] {
 class Application @Inject()(cc:MessagesControllerComponents)(
     implicit 
     val config: Configuration, 
-    env: Environment
+    env: Environment,
+    executionContext: ExecutionContext, 
+    val mat: Materializer
     ) extends MessagesAbstractController(cc) {
   
   val apiService = new ApiService()
