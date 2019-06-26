@@ -51,6 +51,7 @@ lazy val client: Project = (project in file("client"))
 // Client projects (just one in this case)
 lazy val clients = Seq(client)
 
+// SbtWeb and SbtLess should be enabled by Play plugin
 // instantiate the JVM project for SBT with some additional settings
 lazy val server = (project in file("server"))
   .settings(
