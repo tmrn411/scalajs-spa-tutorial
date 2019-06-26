@@ -16,7 +16,12 @@ object Router extends autowire.Server[ByteBuffer, Pickler, Pickler] {
   override def write[R: Pickler](r: R) = Pickle.intoBytes(r)
 }
 
-class Application @Inject() (implicit val config: Configuration, env: Environment) extends Controller {
+class Application @Inject()(cc:MessagesControllerComponents)(
+    implicit 
+    val config: Configuration, 
+    env: Environment
+    ) extends MessagesAbstractController(cc) {
+  
   val apiService = new ApiService()
 
   def index = Action {
