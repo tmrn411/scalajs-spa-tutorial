@@ -26,6 +26,7 @@ object Settings {
     val scala = "2.11.11"
     val scalaDom = "0.9.7"
     val scalajsReact = "1.1.1"
+    //val scalajsReact = "1.4.2"
     val scalaCSS = "0.5.5"
     val log4js = "1.4.10"
     val autowire = "0.2.6"

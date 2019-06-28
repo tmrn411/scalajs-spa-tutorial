@@ -60,6 +60,7 @@ lazy val server = (project in file("server"))
     scalaVersion := Settings.versions.scala,
     scalacOptions ++= Settings.scalacOptions,
     libraryDependencies ++= Settings.jvmDependencies.value,
+    libraryDependencies += ws,
     libraryDependencies += guice,
     commands += ReleaseCmd,
     // triggers scalaJSPipeline when using compile or continuous compilation
