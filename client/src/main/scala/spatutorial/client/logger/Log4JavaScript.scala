@@ -1,16 +1,22 @@
 package spatutorial.client.logger
 
 import scala.scalajs.js
-import scala.scalajs.js.annotation.JSGlobal
+import scala.scalajs.js.annotation.JSImport
+import scala.scalajs.js.annotation.JSImport.Namespace
 
 /**
  * Facade for functions in log4javascript that we need
+ * 
+ * http://log4javascript.org/docs/manual.html#levels
+ * 
  */
 @js.native
-private[logger] trait Log4JavaScript extends js.Object {
-  def getLogger(name:js.UndefOr[String]):JSLogger = js.native
-  def setEnabled(enabled:Boolean):Unit = js.native
-  def isEnabled:Boolean = js.native
+@JSImport("log4javascript", Namespace)
+private[logger] object Log4JavaScript extends js.Object {
+  def getLogger(name:js.UndefOr[String]): JSLogger = js.native
+  def setEnabled(enabled: Boolean):Unit = js.native
+  def isEnabled: Boolean = js.native
+  
 }
 
 @js.native
@@ -49,7 +55,7 @@ private[logger] trait JSLogger extends js.Object {
 private[logger] trait Layout extends js.Object
 
 @js.native
-@JSGlobal("log4javascript.JsonLayout")
+@JSImport("log4javascript", "JsonLayout")
 private[logger] class JsonLayout extends Layout
 
 @js.native
@@ -59,28 +65,22 @@ private[logger] trait Appender extends js.Object {
 }
 
 @js.native
-@JSGlobal("log4javascript.BrowserConsoleAppender")
+@JSImport("log4javascript", "BrowserConsoleAppender")
 private[logger] class BrowserConsoleAppender extends Appender
 
 @js.native
-@JSGlobal("log4javascript.PopUpAppender")
+@JSImport("log4javascript", "PopUpAppender")
 private[logger] class PopUpAppender extends Appender
 
 @js.native
-@JSGlobal("log4javascript.AjaxAppender")
+@JSImport("log4javascript", "AjaxAppender")
 private[logger] class AjaxAppender(url:String) extends Appender {
   def addHeader(header:String, value:String):Unit = js.native
 }
 
-@js.native
-@js.annotation.JSGlobalScope
-private[logger] object Log4JavaScript extends js.Object {
-  val log4javascript:Log4JavaScript = js.native
-}
-
 class L4JSLogger(jsLogger:JSLogger) extends Logger {
 
-  private var ajaxAppender:AjaxAppender = null
+  private var ajaxAppender: AjaxAppender = null
 
   private def undefOrError(e:Exception):js.UndefOr[js.Error] = {
     if(e == null)
@@ -106,7 +106,7 @@ class L4JSLogger(jsLogger:JSLogger) extends Logger {
     if(ajaxAppender == null) {
       ajaxAppender = new AjaxAppender(url)
       ajaxAppender.addHeader("Content-Type", "application/json")
-      ajaxAppender.setLayout(new JsonLayout)
+      ajaxAppender.setLayout(new JsonLayout())
       jsLogger.addAppender(ajaxAppender)
 
     }

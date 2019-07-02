@@ -6,7 +6,7 @@ import org.scalajs.dom.raw.HTMLCanvasElement
 
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
-import scala.scalajs.js.annotation.JSGlobal
+import scala.scalajs.js.annotation.JSImport
 
 @js.native
 trait ChartDataset extends js.Object {
@@ -75,7 +75,7 @@ object ChartConfiguration {
 
 // define a class to access the Chart.js component
 @js.native
-@JSGlobal("Chart")
+@JSImport("chart.js", "Chart")
 class JSChart(ctx: js.Dynamic, config: ChartConfiguration) extends js.Object
 
 object Chart {
@@ -94,13 +94,23 @@ object Chart {
       <.canvas(VdomAttr("width") := p.width, VdomAttr("height") := p.height)
     )
     .componentDidMount(scope => Callback {
-      // access context of the canvas
-      val ctx = scope.getDOMNode.asInstanceOf[HTMLCanvasElement].getContext("2d")
-      // create the actual chart using the 3rd party component
-      scope.props.style match {
-        case LineChart => new JSChart(ctx, ChartConfiguration("line", scope.props.data))
-        case BarChart => new JSChart(ctx, ChartConfiguration("bar", scope.props.data))
-        case _ => throw new IllegalArgumentException
+      /*
+       * change from React v15 to 16.
+       * https://github.com/japgolly/scalajs-react/blob/master/doc/USAGE.md
+       */
+      scope.getDOMNode.toElement match {
+        case Some(element) => {
+          // access context of the canvas
+          val ctx = element.asInstanceOf[HTMLCanvasElement].getContext("2d")
+          
+          // create the actual chart using the 3rd party component
+          scope.props.style match {
+            case LineChart => new JSChart(ctx, ChartConfiguration("line", scope.props.data))
+            case BarChart => new JSChart(ctx, ChartConfiguration("bar", scope.props.data))
+            case _ => throw new IllegalArgumentException
+          }
+        }
+        case _ => {}   // if node was unmounted (though this is not expected), just silently do nothing
       }
     }).build
 

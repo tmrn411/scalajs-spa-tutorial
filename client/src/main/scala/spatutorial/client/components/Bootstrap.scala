@@ -5,6 +5,8 @@ import japgolly.scalajs.react.vdom.html_<^._
 
 import scala.language.implicitConversions
 import scala.scalajs.js
+import scala.scalajs.js.annotation.JSImport
+import scala.scalajs.js.annotation.JSImport.Namespace
 import scalacss.ScalaCssReact._
 import spatutorial.client.CssSettings._
 
@@ -15,6 +17,21 @@ object Bootstrap {
 
   // shorthand for styles
   @inline private def bss = GlobalStyles.bootstrapStyles
+  
+  /*
+   * After switching to npm modules (ie. instead of webjars) the Bootstrap lib 
+   * must be explicitly loaded before the implicit jq2bootstrap is called 
+   */
+  private object BootstrapLib {
+    @js.native
+    @JSImport("bootstrap", Namespace)
+    object BootstrapModule extends js.Object
+    
+    private lazy val dummy = BootstrapModule
+    
+    def load() = dummy
+  }
+  BootstrapLib.load()
 
   @js.native
   trait BootstrapJQuery extends JQuery {
@@ -65,9 +82,16 @@ object Bootstrap {
                      keyboard: Boolean = true)
 
     class Backend(t: BackendScope[Props, Unit]) {
-      def hide =
+      def hide = {
         // instruct Bootstrap to hide the modal
-        t.getDOMNode.map(jQuery(_).modal("hide")).void
+        // Note, since React v16, pattern to get Dom node has changed, see .getDOMNode
+        // https://github.com/japgolly/scalajs-react/blob/v1.3.1/doc/USAGE.md
+        t.getDOMNode.map{_.toElement match {
+          case Some(element) => jQuery(element).modal("hide")
+          case _ => {}   // if node was unmounted (though this is not expected), just silently do nothing
+        }}
+        .void
+      }
 
       // jQuery event handler to be fired when the modal has been hidden
       def hidden(e: JQueryEventObject): js.Any = {
@@ -92,11 +116,18 @@ object Bootstrap {
     val component = ScalaComponent.builder[Props]("Modal")
       .renderBackendWithChildren[Backend]
       .componentDidMount(scope => Callback {
+        // Note, since React v16, pattern to get Dom node has changed, see .getDOMNode
+        // https://github.com/japgolly/scalajs-react/blob/v1.3.1/doc/USAGE.md
         val p = scope.props
-        // instruct Bootstrap to show the modal
-        jQuery(scope.getDOMNode).modal(js.Dynamic.literal("backdrop" -> p.backdrop, "keyboard" -> p.keyboard, "show" -> true))
-        // register event listener to be notified when the modal is closed
-        jQuery(scope.getDOMNode).on("hidden.bs.modal", null, null, scope.backend.hidden _)
+        scope.getDOMNode.toElement match {
+          case Some(element) => {
+            // instruct Bootstrap to show the modal
+            jQuery(element).modal(js.Dynamic.literal("backdrop" -> p.backdrop, "keyboard" -> p.keyboard, "show" -> true))
+            // register event listener to be notified when the modal is closed
+            jQuery(element).on("hidden.bs.modal", null, null, scope.backend.hidden _)
+          }
+          case _ => {}  // if node was unmounted (though this is not expected), just silently do nothing
+        }
       })
       .build
 
