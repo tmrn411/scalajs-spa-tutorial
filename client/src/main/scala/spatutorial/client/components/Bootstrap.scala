@@ -88,6 +88,7 @@ object Bootstrap {
         // https://github.com/japgolly/scalajs-react/blob/v1.3.1/doc/USAGE.md
         t.getDOMNode.map{_.toElement match {
           case Some(element) => jQuery(element).modal("hide")
+          case _ => {}   // if node was unmounted (though this is not expected), just silently do nothing
         }}
         .void
       }
@@ -125,6 +126,7 @@ object Bootstrap {
             // register event listener to be notified when the modal is closed
             jQuery(element).on("hidden.bs.modal", null, null, scope.backend.hidden _)
           }
+          case _ => {}  // if node was unmounted (though this is not expected), just silently do nothing
         }
       })
       .build

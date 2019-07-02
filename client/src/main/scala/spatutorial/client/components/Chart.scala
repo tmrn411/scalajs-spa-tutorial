@@ -110,6 +110,7 @@ object Chart {
             case _ => throw new IllegalArgumentException
           }
         }
+        case _ => {}   // if node was unmounted (though this is not expected), just silently do nothing
       }
     }).build
 
