@@ -1,42 +1,22 @@
 package spatutorial.client.logger
 
 import scala.scalajs.js
-import scala.scalajs.js.annotation.JSGlobal
 import scala.scalajs.js.annotation.JSImport
 import scala.scalajs.js.annotation.JSImport.Namespace
-import scala.scalajs.js.annotation.JSName
 
 /**
  * Facade for functions in log4javascript that we need
  * 
- * Docs for log4javascript api
  * http://log4javascript.org/docs/manual.html#levels
  * 
- * Note: many api calls have optional arguments.  This facade does NOT
- * implement the full API.  Therefore, contructors and functions below
- * may have only a subset (ie. including 0) of the arguments available
- * in the underlying api.
  */
-@JSImport("log4javascript", Namespace)
 @js.native
+@JSImport("log4javascript", Namespace)
 private[logger] object Log4JavaScript extends js.Object {
-  
-  object Level extends Level
-  
-  def resetConfiguration(): Unit = js.native
   def getLogger(name:js.UndefOr[String]): JSLogger = js.native
   def setEnabled(enabled: Boolean):Unit = js.native
   def isEnabled: Boolean = js.native
   
-  class BrowserConsoleAppender() extends Appender {}
-  
-  class PopUpAppender() extends Appender {}
-  
-  class AjaxAppender(url: String, withCredentials: js.UndefOr[Boolean] = js.undefined) extends Appender {
-    def addHeader(name: String, value: String): Unit = js.native 
-  }
-  
-  class JsonLayout() extends Layout {}
 }
 
 @js.native
@@ -75,15 +55,30 @@ private[logger] trait JSLogger extends js.Object {
 private[logger] trait Layout extends js.Object
 
 @js.native
+@JSImport("log4javascript", "JsonLayout")
+private[logger] class JsonLayout extends Layout
+
+@js.native
 private[logger] trait Appender extends js.Object {
   def setLayout(layout:Layout):Unit = js.native
   def setThreshold(level:Level):Unit = js.native
 }
 
+@js.native
+@JSImport("log4javascript", "BrowserConsoleAppender")
+private[logger] class BrowserConsoleAppender extends Appender
+
+@js.native
+@JSImport("log4javascript", "PopUpAppender")
+private[logger] class PopUpAppender extends Appender
+
+@js.native
+@JSImport("log4javascript", "AjaxAppender")
+private[logger] class AjaxAppender(url:String) extends Appender {
+  def addHeader(header:String, value:String):Unit = js.native
+}
 
 class L4JSLogger(jsLogger:JSLogger) extends Logger {
-  import Log4JavaScript.AjaxAppender
-  import Log4JavaScript.JsonLayout
 
   private var ajaxAppender: AjaxAppender = null
 

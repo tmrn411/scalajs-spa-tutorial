@@ -32,8 +32,8 @@ trait Logger {
 object LoggerFactory {
   private[logger] def createLogger(name: String) = {}
 
-  lazy val consoleAppender = new Log4JavaScript.BrowserConsoleAppender()
-  lazy val popupAppender = new Log4JavaScript.PopUpAppender()
+  lazy val consoleAppender = new BrowserConsoleAppender()
+  lazy val popupAppender = new PopUpAppender()
 
   /**
    * Create a logger that outputs to browser console
