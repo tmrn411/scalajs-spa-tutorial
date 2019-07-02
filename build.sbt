@@ -34,9 +34,22 @@ lazy val client: Project = (project in file("client"))
     // by default we do development build, no eliding
     elideOptions := Seq(),
     scalacOptions ++= elideOptions.value,
-    jsDependencies ++= Settings.jsDependencies.value,
+    npmDependencies in Compile ++= Settings.npmDependencies,
+	// config webpack to create global vars for javascript modules
+	// example project with build settings
+	// https://github.com/scalacenter/scalajs-bundler/tree/master/sbt-scalajs-bundler/src/sbt-test/sbt-scalajs-bundler/global-namespace-with-jsdom-unit-testing_sjs-0.6
+	npmDevDependencies in Compile ++= Seq(
+	  "webpack-merge" -> "4.1.2",
+	  "imports-loader" -> "0.8.0",
+	  "expose-loader" -> "0.7.5"
+	),
+	// for now, use same webpack config for all phases
+	webpackConfigFile := Some(baseDirectory.value / "dev.webpack.config.js"),
+	//webpackConfigFile in fastOptJS := Some(baseDirectory.value / "dev.webpack.config.js"),
+	//webpackConfigFile in Test := Some(baseDirectory.value / "test.webpack.config.js"),
+	
     // RuntimeDOM is needed for tests
-    jsDependencies += RuntimeDOM % "test",
+    //jsDependencies += RuntimeDOM % "test",
     // yes, we want to package JS dependencies
     skip in packageJSDependencies := false,
     // use Scala.js provided launcher code to start the client app
@@ -45,7 +58,7 @@ lazy val client: Project = (project in file("client"))
     // use uTest framework for tests
     testFrameworks += new TestFramework("utest.runner.Framework")
   )
-  .enablePlugins(ScalaJSPlugin, ScalaJSWeb)
+  .enablePlugins(ScalaJSPlugin, ScalaJSWeb, ScalaJSBundlerPlugin)
   .dependsOn(sharedJS)
 
 // Client projects (just one in this case)
@@ -71,7 +84,7 @@ lazy val server = (project in file("server"))
     // compress CSS
     LessKeys.compress in Assets := true
   )
-  .enablePlugins(PlayScala)
+  .enablePlugins(PlayScala, WebScalaJSBundlerPlugin)
   .disablePlugins(PlayLayoutPlugin) // use the standard directory layout instead of Play's custom
   .aggregate(clients.map(projectToRef): _*)
   .dependsOn(sharedJVM)
