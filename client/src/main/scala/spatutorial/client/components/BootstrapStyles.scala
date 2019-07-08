@@ -62,6 +62,7 @@ class BootstrapStyles(implicit r: mutable.Register) extends StyleSheet.Inline()(
 
   val _listGroup = listGroup
   val pullRight = styleWrap("pull-right")
+  val pullLeft = styleWrap("pull-left")
   val buttonXS = styleWrap("btn-xs")
   val close = styleWrap("close")
 
