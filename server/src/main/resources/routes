@@ -5,7 +5,9 @@
 # Home page
 GET     /                                 controllers.Application.index
 
-POST    /upload                           controllers.Application.upload
+GET     /download                   	  controllers.FileIO.download
+
+POST    /upload                           controllers.FileIO.upload
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/fonts/*file               controllers.Assets.at(path="/public/lib/font-awesome/fonts", file)
