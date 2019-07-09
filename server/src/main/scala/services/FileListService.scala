@@ -5,6 +5,8 @@ import java.util.{UUID, Date}
 import spatutorial.shared._
 
 class FileListService extends FileListApi {
+  val rootDir = controllers.AppFileIO.rootDir
+  
   var files = Seq(
     FileListItem("file1.mat", "datasets"),
     FileListItem("file2.mat", "datasets")

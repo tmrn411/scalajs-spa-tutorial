@@ -24,7 +24,7 @@ import play.api.libs.streams.Accumulator
 import play.api.mvc._
 
 @Singleton
-class FileIO @Inject()(cc:MessagesControllerComponents)(
+class AppFileIO @Inject()(cc:MessagesControllerComponents)(
     implicit 
     val config: Configuration, 
     env: Environment,
@@ -36,7 +36,7 @@ class FileIO @Inject()(cc:MessagesControllerComponents)(
   
   private var testFilePath: Option[Path] = Some(Paths.get("/var/tmp/Classifier/tmp.mat"))
   
-  private val rootDir = "/var/tmp/Classifier"
+  private val rootDir = AppFileIO.rootDir 
   
   def checkAndCreateDir( fullPath: Path ) {
     if ( Files.notExists(fullPath)) { 
@@ -81,4 +81,9 @@ class FileIO @Inject()(cc:MessagesControllerComponents)(
     logger.info("downloading " + testFilePath.get.toString)
     Ok.sendFile(new java.io.File(testFilePath.get.toString))
   } 
+}
+
+object AppFileIO {
+  val rootDir = "/var/tmp/scalajs-spa-tutorial"
+  
 }
