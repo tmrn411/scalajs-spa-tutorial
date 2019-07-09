@@ -58,6 +58,61 @@ object Bootstrap {
     def apply(props: Props, children: VdomNode*) = component(props)(children: _*)
     def apply() = component
   }
+  
+  /*
+   * A button that will trigger the submit behavior of its parent form
+   * 
+   * docs on bootstrap button tags
+   * https://getbootstrap.com/docs/4.0/components/buttons/#button-tags
+   */
+  object SubmitButton {
+
+    case class Props(onClick: Callback = Callback.empty, style: CommonStyle.Value = CommonStyle.default, addStyles: Seq[StyleA] = Seq())
+    
+    /*
+     * On Chrome browser, the button maintains focus after being clicked.  This removes focus immediately after
+     * the click.
+     */
+    def onMouseUp(e: ReactEventFromInput) = {
+      Callback {
+        println("on Mouseup")
+        e.target.blur()
+      }
+    }
+
+    val component = ScalaComponent.builder[Props]("Button")
+      .renderPC((_, p, c) =>
+        <.button(bss.buttonOpt(p.style), p.addStyles.toTagMod, ^.tpe := "submit", ^.onClick --> p.onClick, ^.onMouseUp ==> onMouseUp, c)
+      ).build
+
+    def apply(props: Props, children: VdomNode*) = component(props)(children: _*)
+    def apply() = component
+  }
+  
+  /*
+   * A button pre-packaged as a form so that clicking the button will get the url.
+   * Typical usage is to use this button to trigger file download
+   * 
+   * docs on bootstrap button tags
+   * https://getbootstrap.com/docs/4.0/components/buttons/#button-tags
+   */
+  object SubmitFormButton {
+
+    case class Props(url: String, onClick: Callback = Callback.empty, style: CommonStyle.Value = CommonStyle.default, addStyles: Seq[StyleA] = Seq()) //onClick: Callback, style: CommonStyle.Value = CommonStyle.default, addStyles: Seq[StyleA] = Seq())
+
+    val component = ScalaComponent.builder[Props]("FormButton")
+      .renderPC((_, p, c) =>
+        <.form(
+            ^.action := p.url,
+            ^.method := "GET",
+            SubmitButton(SubmitButton.Props(onClick = p.onClick, style = p.style, addStyles = p.addStyles), c)
+            )
+        //<.button(bss.buttonOpt(p.style), p.addStyles.toTagMod, ^.tpe := "submit", ^.onClick --> p.onClick, ^.onMouseUp ==> onMouseUp, c)
+      ).build
+
+    def apply(props: Props, children: VdomNode*) = component(props)(children: _*)
+    def apply() = component
+  }
 
   object Panel {
 
