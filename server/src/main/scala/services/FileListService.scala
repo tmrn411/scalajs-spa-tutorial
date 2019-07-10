@@ -1,30 +1,39 @@
 package services
 
+import scala.collection.JavaConverters._
+
 import java.util.{UUID, Date}
+import java.nio.file.Files
+import java.nio.file.Paths  
 
 import spatutorial.shared._
 
 class FileListService extends FileListApi {
   val rootDir = controllers.AppFileIO.rootDir
-  
-  var files = Seq(
-    FileListItem("file1.mat", "datasets"),
-    FileListItem("file2.mat", "datasets")
-  )
 
   
   // get list of files
   override def getFileList(relDir: String): Seq[FileListItem] = {
-    // provide some fake items
-    println(s"Sending ${files.size} file names")
-    files
+    val dirPath = Paths.get(rootDir, relDir)
+    if (Files.exists(dirPath)) {
+      val fileListItems = Files.newDirectoryStream(dirPath).iterator.asScala.map{ path =>
+        println("dir path: " + path.toString)
+        FileListItem(path.getFileName.toString, relDir)
+      }.toSeq
+      fileListItems
+    }
+    else {
+      println("dir " + dirPath.toString + " is empty") 
+      Seq.empty[FileListItem]
+    }
   }
 
 
   // delete an file
   override def deleteFile(relDir: String, filename: String): Seq[FileListItem] = {
     println(s"Deleting file: $filename")
-    files = files.filterNot(_.filename == filename)
-    files
+    val path = Paths.get(rootDir, relDir, filename)
+    Files.deleteIfExists(path)
+    getFileList(relDir)
   }
 }
