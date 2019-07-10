@@ -77,9 +77,10 @@ class AppFileIO @Inject()(cc:MessagesControllerComponents)(
    * https://www.playframework.com/documentation/2.0.1/ScalaStream
    * https://stackoverflow.com/questions/13917105/how-to-download-a-file-with-play-framework-2-0
    */
-  def download = Action { 
-    logger.info("downloading " + testFilePath.get.toString)
-    Ok.sendFile(new java.io.File(testFilePath.get.toString))
+  def download(filename: String) = Action { 
+    val path = Paths.get(rootDir, filename)
+    logger.info("downloading " + filename)
+    Ok.sendFile(new java.io.File(path.toString))
   } 
 }
 
