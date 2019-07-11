@@ -52,9 +52,17 @@ class AppFileIO @Inject()(cc:MessagesControllerComponents)(
    * https://www.playframework.com/documentation/2.7.x/ScalaBodyParsers
    */
   private val binaryFileParser: BodyParser[IOResult] = BodyParser{ request =>
+    /*
+     * this still needs work. will relative path be part of filename, or transmitted
+     * explicitly in another header 'X-PATHNAME'
+     * 
+     * when relative subdirs do get created, then need to checkAndCreateDir for those also
+     */
     val rootPath = Paths.get(rootDir)
     checkAndCreateDir( rootPath )
-    val path: Path = Files.createTempFile( rootPath, "tmp", ".mat")
+    val filename = request.headers.get("X-FILENAME").get.toString
+    val fullPath = Paths.get(rootPath.toString, filename)
+    val path: Path = Files.createFile( fullPath)
     println("will save to " + path.toString)
     val fileSink: Sink[ByteString, Future[IOResult]] = FileIO.toPath(path)
     val accumulator: Accumulator[ByteString, IOResult] = Accumulator(fileSink)
