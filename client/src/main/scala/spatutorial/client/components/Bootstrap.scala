@@ -59,6 +59,84 @@ object Bootstrap {
     def apply() = component
   }
 
+  object FileChooserButton {
+
+    case class Props(onChange: ReactEventFromInput => Callback, style: CommonStyle.Value = CommonStyle.default, addStyles: Seq[StyleA] = Seq())
+
+    /*
+     * see following on how to create single button file chooser:
+     * https://stackoverflow.com/questions/11235206/twitter-bootstrap-form-file-element-upload-button#18164555
+     * note: this also requred css, see entry for 'hidden' selector in GlobalStyles.scala
+     */
+    val component = ScalaComponent.builder[Props]("Button")
+      .renderPC((_, p, c) =>
+        <.label(
+            //^.classSet1("btn btn-default"), // should be equivalent to next line when p.style = CommonStyle.default
+            bss.buttonOpt(p.style),
+            ^.onChange ==> p.onChange,
+            c,
+            <.input( ^.tpe := "file", ^.hidden := true)
+            )
+      ).build
+
+    def apply(props: Props, children: VdomNode*) = component(props)(children: _*)
+    def apply() = component
+  }
+  
+  /*
+   * A button that will trigger the submit behavior of its parent form
+   * 
+   * docs on bootstrap button tags
+   * https://getbootstrap.com/docs/4.0/components/buttons/#button-tags
+   */
+  object SubmitButton {
+
+    case class Props(onClick: Callback = Callback.empty, style: CommonStyle.Value = CommonStyle.default, addStyles: Seq[StyleA] = Seq())
+    
+    /*
+     * On Chrome browser, the button maintains focus after being clicked.  This removes focus immediately after
+     * the click.
+     */
+    def onMouseUp(e: ReactEventFromInput) = {
+      Callback {
+        println("on Mouseup")
+        e.target.blur()
+      }
+    }
+
+    val component = ScalaComponent.builder[Props]("Button")
+      .renderPC((_, p, c) =>
+        <.button(bss.buttonOpt(p.style), p.addStyles.toTagMod, ^.tpe := "submit", ^.onClick --> p.onClick, ^.onMouseUp ==> onMouseUp, c)
+      ).build
+
+    def apply(props: Props, children: VdomNode*) = component(props)(children: _*)
+    def apply() = component
+  }
+  
+  /*
+   * A button pre-packaged as a form so that clicking the button will get the url.
+   * Typical usage is to use this button to trigger file download
+   * 
+   * docs on bootstrap button tags
+   * https://getbootstrap.com/docs/4.0/components/buttons/#button-tags
+   */
+  object SubmitFormButton {
+
+    case class Props(url: String, onClick: Callback = Callback.empty, style: CommonStyle.Value = CommonStyle.default, addStyles: Seq[StyleA] = Seq()) //onClick: Callback, style: CommonStyle.Value = CommonStyle.default, addStyles: Seq[StyleA] = Seq())
+
+    val component = ScalaComponent.builder[Props]("FormButton")
+      .renderPC((_, p, c) =>
+        <.form(
+            ^.action := p.url,
+            ^.method := "GET",
+            SubmitButton(SubmitButton.Props(onClick = p.onClick, style = p.style, addStyles = p.addStyles), c)
+            )
+      ).build
+
+    def apply(props: Props, children: VdomNode*) = component(props)(children: _*)
+    def apply() = component
+  }
+
   object Panel {
 
     case class Props(heading: String, style: CommonStyle.Value = CommonStyle.default)

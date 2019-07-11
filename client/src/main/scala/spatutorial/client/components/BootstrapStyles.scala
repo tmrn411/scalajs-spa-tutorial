@@ -62,8 +62,10 @@ class BootstrapStyles(implicit r: mutable.Register) extends StyleSheet.Inline()(
 
   val _listGroup = listGroup
   val pullRight = styleWrap("pull-right")
+  val pullLeft = styleWrap("pull-left")
   val buttonXS = styleWrap("btn-xs")
   val close = styleWrap("close")
+  val clearFix = styleWrap("clearfix")
 
   val labelAsBadge = style(addClassName("label-as-badge"), borderRadius(1.em))
 
