@@ -58,6 +58,30 @@ object Bootstrap {
     def apply(props: Props, children: VdomNode*) = component(props)(children: _*)
     def apply() = component
   }
+
+  object FileChooserButton {
+
+    case class Props(onChange: ReactEventFromInput => Callback, style: CommonStyle.Value = CommonStyle.default, addStyles: Seq[StyleA] = Seq())
+
+    /*
+     * see following on how to create single button file chooser:
+     * https://stackoverflow.com/questions/11235206/twitter-bootstrap-form-file-element-upload-button#18164555
+     * note: this also requred css, see entry for 'hidden' selector in GlobalStyles.scala
+     */
+    val component = ScalaComponent.builder[Props]("Button")
+      .renderPC((_, p, c) =>
+        <.label(
+            //^.classSet1("btn btn-default"), // should be equivalent to next line when p.style = CommonStyle.default
+            bss.buttonOpt(p.style),
+            ^.onChange ==> p.onChange,
+            c,
+            <.input( ^.tpe := "file", ^.hidden := true)
+            )
+      ).build
+
+    def apply(props: Props, children: VdomNode*) = component(props)(children: _*)
+    def apply() = component
+  }
   
   /*
    * A button that will trigger the submit behavior of its parent form
@@ -107,7 +131,6 @@ object Bootstrap {
             ^.method := "GET",
             SubmitButton(SubmitButton.Props(onClick = p.onClick, style = p.style, addStyles = p.addStyles), c)
             )
-        //<.button(bss.buttonOpt(p.style), p.addStyles.toTagMod, ^.tpe := "submit", ^.onClick --> p.onClick, ^.onMouseUp ==> onMouseUp, c)
       ).build
 
     def apply(props: Props, children: VdomNode*) = component(props)(children: _*)
